@@ -232,6 +232,8 @@ class BaseSignupForm(_base_signup_form_class()):
                 except User.DoesNotExist:
                     break
         user.email = self.cleaned_data["email"].strip().lower()
+        # @TODO this is MRA specific hack!!
+        user.username = user.email
         user.set_unusable_password()
         if commit:
             user.save()
@@ -320,10 +322,14 @@ class SignupForm(BaseSignupForm):
                         )
                     EmailAddress.objects.add_email(new_user, email)
         else:
-            send_email_confirmation(new_user, request=request)
+            # @TODO MRA hack
+            pass
+            # send_email_confirmation(new_user, request=request)
 
         self.after_signup(new_user)
         
+        # @TODO MRA hack
+        user.username = user.email
         return new_user
     
     def after_signup(self, user, **kwargs):
