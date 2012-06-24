@@ -103,12 +103,14 @@ class LoginForm(forms.Form):
             else:
                 credentials["username"] = login
         credentials["password"] = self.cleaned_data["password"]
+        # @TODO MRA specific hack
+        credentials["username"] = credentials["email"]
         return credentials
     
     def clean(self):
         if self._errors:
             return
-        user = authenticate(**self.user_credentials())
+        user = authenticate(username=self.user_credentials()['username'], password=self.user_credentials()['password'])
         if user:
             if user.is_active:
                 self.user = user
@@ -299,6 +301,8 @@ class SignupForm(BaseSignupForm):
             confirmed = False
         
         new_user = self.create_user()
+        # @TODO MRA hack
+        new_user.username = new_user.email
         super(SignupForm, self).save(new_user)
 
         # @@@ clean up some of the repetition below -- DRY!
@@ -329,7 +333,7 @@ class SignupForm(BaseSignupForm):
         self.after_signup(new_user)
         
         # @TODO MRA hack
-        user.username = user.email
+        new_user.username = new_user.email
         return new_user
     
     def after_signup(self, user, **kwargs):
