@@ -329,7 +329,7 @@ class SignupForm(BaseSignupForm):
         self.after_signup(new_user)
         
         # @TODO MRA hack
-        user.username = user.email
+        new_user.username = new_user.email
         return new_user
     
     def after_signup(self, user, **kwargs):
